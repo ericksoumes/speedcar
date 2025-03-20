@@ -2,6 +2,7 @@ import pygame
 import random
 
 from Code.Const import WIN_WIDTH, WIN_HEIGHT
+from Code.Score import ScoreScreen
 
 
 class RaceGame:
@@ -29,7 +30,7 @@ class RaceGame:
 
         self.road_y = 60
         self.road_speed = 2
-        self.score = 0  # Pontuação do jogador
+        self.score = 0
         self.frame_count = 0  # Contador de frames para controlar a pontuação
         self.last_speed_increment = 0  # Guarda a última pontuação em que a velocidade foi aumentada
 
@@ -53,14 +54,14 @@ class RaceGame:
                 quit()
 
     def update(self):
-        self.frame_count += 1  # Incrementa o contador de frames
+        self.frame_count += 1
 
         # Move a estrada
         self.road_y += self.road_speed
         if self.road_y >= WIN_HEIGHT:
             self.road_y = 0
 
-        # Atualizar a pontuação
+        # Aumenta a pontuação
         if self.frame_count % 5 == 0:
             self.score += 1
 
@@ -69,7 +70,7 @@ class RaceGame:
             self.road_speed += 1
             self.last_speed_increment = self.score
 
-        # Gerar novos obstáculos aleatórios
+        # Gera obtaculos
         if random.randint(1, 60) == 1:
             obstacle_img = random.choice(self.obstacle_images)
             obstacle_x = random.randint(80, WIN_WIDTH - 160)
@@ -88,9 +89,13 @@ class RaceGame:
                     self.car_x + self.car.get_width() > obstacle[1] and
                     self.car_y < obstacle[2] + obstacle[0].get_height() and
                     self.car_y + self.car.get_height() > obstacle[2]):
-                print("Game Over! Score:", self.score)
-                self.running = False
+                self.game_over()
                 return
+
+    def game_over(self):
+        score_screen = ScoreScreen(self.window, self.score)
+        score_screen.run()
+        self.running = False
 
     def render(self):
         self.window.blit(self.bg, (0, 0))  # Desenha o fundo fixo
